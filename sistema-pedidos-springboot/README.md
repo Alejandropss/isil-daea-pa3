@@ -10,6 +10,76 @@ El proyecto conserva una interfaz **Spring MVC + JSP** y expone una **API JSON**
 
 **Alcance:** Implementación académica para ejecución local. No constituye una solución de seguridad lista para producción.
 
+## PA3: módulo de consulta y supervisión
+
+Agregué una pantalla de reportes protegida, dos consultas con Spring JDBC y su API JSON. El registro de pedidos con JPA y la integración con Inventario siguen igual.
+
+![Arquitectura PA3](../docs/arquitectura-pa3.png)
+
+**Tecnologías:** Java 21, Spring Boot 4.1, Spring MVC + JSP, Spring Security, Spring JDBC, Spring Data JPA, MySQL 8.4 (ejecución normal) y H2 (solo pruebas).
+
+**Requisitos:** JDK 21, Maven, MySQL 8.x y, para registrar pedidos, `inventario-service` con SQL Server.
+
+**Base de datos:** crear la base `pedidosdb` y el usuario de laboratorio una sola vez:
+
+```bash
+mysql -u root -p < database/Script_BD_usuario_MySql.sql
+```
+
+**Variables de entorno** (opcionales; sin ellas se usan los valores de laboratorio de `application.properties`):
+
+```powershell
+$env:DB_URL = "jdbc:mysql://localhost:3306/pedidosdb?serverTimezone=America/Lima"
+$env:DB_USERNAME = "spedidos_app"
+$env:DB_PASSWORD = "<clave-local>"
+```
+
+**Orden de arranque:** MySQL → SQL Server → WildFly (`mvn clean wildfly:run` en `inventario-service`) → Spring Boot (`mvn spring-boot:run` aquí).
+
+**Usuarios de laboratorio:** `operador` (rol OPERADOR) y `consulta` (rol CONSULTA). Sus claves están en la sección 6 de este README y se pueden cambiar con `PEDIDOS_OPERADOR_PASSWORD` y `PEDIDOS_CONSULTA_PASSWORD`.
+
+### Rutas nuevas
+
+Todas son GET, requieren iniciar sesión y las pueden usar OPERADOR y CONSULTA.
+
+| Ruta | Qué hace |
+|---|---|
+| `/reportes/pedidos` | Pantalla JSP con resumen, búsqueda y clientes frecuentes |
+| `/api/v1/pedidos/busqueda-avanzada?cliente={valor}&totalMinimo={monto}` | Pedidos de ese cliente con total mayor o igual al monto |
+| `/api/v1/pedidos/clientes-frecuentes?minPedidos={n}` | Clientes con al menos n pedidos y sus totales |
+
+Ejemplo de `clientes-frecuentes?minPedidos=2`:
+
+```json
+[{ "cliente": "Ana Torres", "totalPedidos": 2, "totalUnidades": 3,
+   "importeAcumulado": 5120.00, "ticketPromedio": 2560.00 }]
+```
+
+Errores: `400` si un parámetro es inválido o falta, y `503` si la base de datos no responde. Hay ejemplos en `requests/reportes.http`.
+
+### Pruebas
+
+```bash
+mvn test
+```
+
+35 pruebas, 0 fallos. No necesita MySQL porque usa H2. Las nuevas de la PA3 son `PedidoReporteJdbcPa3Test`, `PedidoReporteServiceValidacionTest` y `PedidoReporteSeguridadPa3Test`.
+
+### Reproducir los cinco casos
+
+En `../scripts/demo-pa3/` hay un script por caso. Se ejecutan en orden, con la tabla `pedido` vacía y el stock reiniciado; el 4 apaga WildFly, así que hay que levantarlo otra vez antes del 5. Si `mysql` no está en el PATH, indicar su ruta en `MYSQL_EXE`.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File ..\scripts\demo-pa3\caso1-busqueda.ps1
+```
+
+### Limitaciones
+
+- Los usuarios están en memoria; no hay JWT ni usuarios en base de datos (la PA3 no los pide).
+- Con Inventario detenido, la pantalla `/pedidos` responde 503 porque carga el catálogo; `/reportes/pedidos` sí funciona.
+- La búsqueda usa `LIKE`, así que un `%` en el cliente coincide con todos. No es inyección SQL, pero sí trae más resultados.
+- Las consultas no tienen paginación.
+
 ## Contenido
 
 1. [Objetivos y evolución académica](#1-objetivos-y-evolución-académica)

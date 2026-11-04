@@ -1,0 +1,54 @@
+@startuml arquitectura-pa3
+!pragma layout smetana
+skinparam defaultFontName Calibri
+skinparam defaultFontSize 13
+skinparam shadowing false
+skinparam roundCorner 8
+skinparam componentStyle rectangle
+skinparam ArrowColor #444444
+skinparam ArrowFontSize 11
+skinparam rectangle {
+  BorderColor #555555
+}
+skinparam database {
+  BackgroundColor #FFF4D6
+  BorderColor #A07800
+}
+skinparam component {
+  BackgroundColor #FFFFFF
+  BorderColor #555555
+}
+
+title PA3 - Módulo de consulta y supervisión de pedidos
+
+actor "Navegador" as nav
+
+rectangle "sistema-pedidos-springboot  -  Spring Boot 4.1  -  puerto 8081" as app #EAF2FB {
+  component "Spring Security\n(login, roles, CSRF)" as sec
+  component "DispatcherServlet" as ds
+  component "PedidoController\nPedidoReporteWebController\n(JSP + Model)" as web
+  component "PedidoReporteController\n(@RestController, JSON)" as api
+  component "PedidoService" as ps
+  component "PedidoReporteService\n(validaciones)" as rs
+  component "PedidoRepository\n(Spring Data JPA)" as jpa
+  component "PedidoReporteJdbcRepository\n(Spring JDBC)" as jdbc
+  component "InventarioRestClient" as cli
+}
+
+database "MySQL\npedidosdb" as mysql
+rectangle "inventario-service\nWildFly - puerto 8082\n(integración externa)" as inv #EEF7EA
+
+nav --> sec : HTTP
+sec --> ds : autorizado
+ds --> web
+ds --> api
+web --> ps
+web --> rs
+api --> rs
+ps --> jpa : registrar / listar
+ps --> cli : reservar stock
+rs --> jdbc : consultas nuevas
+jpa --> mysql
+jdbc --> mysql
+cli --> inv : HTTP/JSON
+@enduml
