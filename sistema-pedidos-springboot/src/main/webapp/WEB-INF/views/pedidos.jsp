@@ -22,6 +22,8 @@
                 El catálogo, precio y stock provienen de inventario-service; H2 conserva los pedidos durante la ejecución.
             </p>
         </div>
+        <c:url var="reportesUrl" value="/reportes/pedidos"/>
+        <a href="${reportesUrl}">Ver reportes</a>
         <c:url var="logoutUrl" value="/logout"/>
         <form method="post" action="${logoutUrl}">
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">

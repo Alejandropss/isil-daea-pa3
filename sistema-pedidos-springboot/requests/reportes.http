@@ -1,0 +1,20 @@
+### PA3 - API de reportes. Primero iniciar sesión en el navegador (operador o consulta)
+### y copiar la cookie JSESSIONID.
+@base = http://localhost:8081/sistema-pedidos
+@cookie = JSESSIONID=pegar-aqui
+
+### Búsqueda avanzada -> 200
+GET {{base}}/api/v1/pedidos/busqueda-avanzada?cliente=Ana&totalMinimo=1000
+Cookie: {{cookie}}
+
+### Clientes frecuentes -> 200
+GET {{base}}/api/v1/pedidos/clientes-frecuentes?minPedidos=2
+Cookie: {{cookie}}
+
+### Total negativo -> 400
+GET {{base}}/api/v1/pedidos/busqueda-avanzada?cliente=Ana&totalMinimo=-1
+Cookie: {{cookie}}
+
+### minPedidos 0 -> 400
+GET {{base}}/api/v1/pedidos/clientes-frecuentes?minPedidos=0
+Cookie: {{cookie}}

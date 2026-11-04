@@ -30,3 +30,10 @@ code { font-family: Consolas, monospace; }
     .flujo { margin-top: 16px; white-space: normal; }
     .form-grid { grid-template-columns: 1fr; }
 }
+
+/* PA3: pantalla de reportes */
+.acciones { display: flex; gap: 16px; align-items: center; }
+.form-reporte { display: grid; grid-template-columns: 2fr 1fr auto; gap: 16px; align-items: end; margin-bottom: 16px; }
+.resumen-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.resumen-grid span { display: block; color: #5f6368; font-size: .84rem; }
+.resumen-grid strong { font-size: 1.25rem; }

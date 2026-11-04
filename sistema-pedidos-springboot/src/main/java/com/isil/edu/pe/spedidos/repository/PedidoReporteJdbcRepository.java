@@ -2,6 +2,7 @@ package com.isil.edu.pe.spedidos.repository;
 
 import com.isil.edu.pe.spedidos.entity.Pedido;
 import com.isil.edu.pe.spedidos.repository.mapper.PedidoRowMapper;
+import com.isil.edu.pe.spedidos.repository.projection.ClienteFrecuenteProjection;
 import com.isil.edu.pe.spedidos.repository.projection.ProductoVendidoProjection;
 import com.isil.edu.pe.spedidos.repository.projection.ResumenPedidosProjection;
 import java.math.BigDecimal;
@@ -148,6 +149,58 @@ public class PedidoReporteJdbcRepository {
                     )
                 )
             )
+    );
+  }
+
+  /**
+   * PA3: pedidos de un cliente con total mayor o igual al monto indicado.
+   * Los valores viajan como parámetros con nombre, nunca concatenados en el SQL.
+   */
+  public List<Pedido> buscarPedidosPorClienteYTotalMinimo(String cliente, BigDecimal totalMinimo) {
+    String sql = """
+        SELECT %s
+        FROM pedido
+        WHERE LOWER(cliente) LIKE LOWER(:cliente)
+          AND total >= :totalMinimo
+        ORDER BY id DESC
+        """.formatted(COLUMNAS_PEDIDO);
+
+    Map<String, Object> parametros = Map.of(
+        "cliente", "%" + cliente.trim() + "%",
+        "totalMinimo", totalMinimo
+    );
+
+    return namedParameterJdbcTemplate.query(sql, parametros, pedidoRowMapper);
+  }
+
+  /**
+   * PA3: clientes con al menos minPedidos pedidos y sus totales.
+   * WHERE filtra filas; HAVING filtra los grupos ya formados.
+   */
+  public List<ClienteFrecuenteProjection> listarClientesFrecuentes(int minPedidos) {
+    String sql = """
+        SELECT
+            cliente,
+            COUNT(*) AS total_pedidos,
+            SUM(cantidad) AS total_unidades,
+            SUM(total) AS importe_acumulado,
+            ROUND(AVG(total), 2) AS ticket_promedio
+        FROM pedido
+        GROUP BY cliente
+        HAVING COUNT(*) >= :minPedidos
+        ORDER BY total_pedidos DESC, importe_acumulado DESC, cliente
+        """;
+
+    return namedParameterJdbcTemplate.query(
+        sql,
+        Map.of("minPedidos", minPedidos),
+        (rs, rowNum) -> new ClienteFrecuenteProjection(
+            rs.getString("cliente"),
+            rs.getLong("total_pedidos"),
+            rs.getLong("total_unidades"),
+            valorMonetario(rs.getBigDecimal("importe_acumulado")),
+            valorMonetario(rs.getBigDecimal("ticket_promedio"))
+        )
     );
   }
 
