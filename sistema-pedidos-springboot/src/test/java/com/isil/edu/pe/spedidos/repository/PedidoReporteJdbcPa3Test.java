@@ -37,8 +37,8 @@ class PedidoReporteJdbcPa3Test {
   }
 
   @Test
-  @DisplayName("Return only orders matching customer and minimum total, newest first")
-  void returnOnlyOrdersMatchingCustomerAndMinimumTotalNewestFirst() {
+  @DisplayName("Return orders from PedidoReporteJdbcRepository when customer and minimum total match")
+  void returnOrdersFromPedidoReporteJdbcRepositoryWhenCustomerAndMinimumTotalMatch() {
     // Arrange
     insertarPedido("Ana Torres", "MON-001", "Monitor", "850.00", 2, "1700.00");
 
@@ -53,8 +53,8 @@ class PedidoReporteJdbcPa3Test {
   }
 
   @Test
-  @DisplayName("Return no orders when customer value contains SQL text")
-  void returnNoOrdersWhenCustomerValueContainsSqlText() {
+  @DisplayName("Return no orders from PedidoReporteJdbcRepository when customer contains SQL text")
+  void returnNoOrdersFromPedidoReporteJdbcRepositoryWhenCustomerContainsSqlText() {
     // Arrange
     String intento = "' OR '1'='1";
 
@@ -66,8 +66,8 @@ class PedidoReporteJdbcPa3Test {
   }
 
   @Test
-  @DisplayName("Return aggregated values only for customers reaching the minimum orders")
-  void returnAggregatedValuesOnlyForCustomersReachingTheMinimumOrders() {
+  @DisplayName("Return aggregated values from PedidoReporteJdbcRepository when customer reaches minimum orders")
+  void returnAggregatedValuesFromPedidoReporteJdbcRepositoryWhenCustomerReachesMinimumOrders() {
     // Arrange: Ana tiene 2 pedidos y Carlos solo 1.
     int minPedidos = 2;
 

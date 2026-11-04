@@ -35,8 +35,8 @@ class PedidoReporteServiceValidacionTest {
   @ParameterizedTest
   @NullSource
   @ValueSource(strings = {"", "   "})
-  @DisplayName("Reject advanced search when customer is empty")
-  void rejectAdvancedSearchWhenCustomerIsEmpty(String cliente) {
+  @DisplayName("Reject advanced search in PedidoReporteService when customer is empty")
+  void rejectAdvancedSearchInPedidoReporteServiceWhenCustomerIsEmpty(String cliente) {
     // Act
     PedidoException error = assertThrows(PedidoException.class,
         () -> service.buscarPedidosPorClienteYTotalMinimo(cliente, BigDecimal.TEN));
@@ -47,8 +47,8 @@ class PedidoReporteServiceValidacionTest {
   }
 
   @Test
-  @DisplayName("Reject advanced search when minimum total is negative")
-  void rejectAdvancedSearchWhenMinimumTotalIsNegative() {
+  @DisplayName("Reject advanced search in PedidoReporteService when minimum total is negative")
+  void rejectAdvancedSearchInPedidoReporteServiceWhenMinimumTotalIsNegative() {
     // Arrange
     BigDecimal negativo = new BigDecimal("-1");
 
@@ -62,8 +62,8 @@ class PedidoReporteServiceValidacionTest {
   }
 
   @Test
-  @DisplayName("Reject frequent customers when minimum orders is zero")
-  void rejectFrequentCustomersWhenMinimumOrdersIsZero() {
+  @DisplayName("Reject frequent customers in PedidoReporteService when minimum orders is zero")
+  void rejectFrequentCustomersInPedidoReporteServiceWhenMinimumOrdersIsZero() {
     // Act
     PedidoException error = assertThrows(PedidoException.class, () -> service.listarClientesFrecuentes(0));
 
@@ -73,8 +73,8 @@ class PedidoReporteServiceValidacionTest {
   }
 
   @Test
-  @DisplayName("Return frequent customers from repository when minimum orders is valid")
-  void returnFrequentCustomersFromRepositoryWhenMinimumOrdersIsValid() {
+  @DisplayName("Return frequent customers from PedidoReporteService when minimum orders is valid")
+  void returnFrequentCustomersFromPedidoReporteServiceWhenMinimumOrdersIsValid() {
     // Arrange
     when(repository.listarClientesFrecuentes(2)).thenReturn(List.of(
         new ClienteFrecuenteProjection("Ana Torres", 2, 3, new BigDecimal("5120.00"), new BigDecimal("2560.00"))));
